@@ -29,13 +29,21 @@
           <label>客户<select id="askClient"></select></label>
           <label>路演场次<select id="askMeeting"></select></label>
         </div>
-        <div class="ask-layout">
+        <div class="mode-tabs" role="tablist" aria-label="学习模式"><button id="lookupMode" class="mode-tab active" type="button" role="tab" aria-selected="true">查标准答案</button><button id="practiceMode" class="mode-tab" type="button" role="tab" aria-selected="false">模拟客户提问</button></div>
+        <div id="lookupPanel" class="ask-layout">
           <div class="conversation">
             <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
             <form id="askForm" class="ask-form"><label class="sr-only" for="askInput">输入问题</label><input id="askInput" placeholder="例如：这类客户会如何看待组合回撤？" required maxlength="240"><button class="primary" type="submit">提问</button></form>
             <p class="micro">本地关键词检索演示，不是联网大模型；未命中时不会编造答案。</p>
           </div>
           <aside class="context-panel"><div class="panel-title-row"><h2>该范围内的已记录问题</h2><span id="contextCount">0 条</span></div><div id="contextQuestions" class="context-list"></div></aside>
+        </div>
+        <div id="practicePanel" class="practice-panel" hidden>
+          <div class="practice-head"><div><p class="eyebrow">客户提问</p><h2 id="practiceQuestion">选择客户和场次后开始练习</h2><p id="practiceMeta" class="subtle"></p></div><button id="nextQuestion" class="quiet" type="button">换一道题</button></div>
+          <label class="practice-label" for="practiceAnswer">你的回答</label><textarea id="practiceAnswer" rows="6" placeholder="先写出你会如何回应客户，包括需要核实的事实和风险边界。"></textarea>
+          <div class="form-actions"><button id="showAnswer" class="primary" type="button">对照标准答案</button></div>
+          <div id="practiceFeedback" class="practice-feedback" hidden></div>
+          <p class="micro">本地版只做对照，不给自动评分；正式版可由审核过的知识提供练习反馈。</p>
         </div>
       </section>
       <section id="captureView" class="view" aria-labelledby="captureTitle">
