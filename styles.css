@@ -1,0 +1,99 @@
+:root {
+  color-scheme: light;
+  --orange: #a84218;
+  --orange-strong: #d95a1c;
+  --orange-light: #fff1e8;
+  --line: #eadcd1;
+  --ink: #302b28;
+  --muted: #776f69;
+  --page: #f7f5f3;
+  --white: #fff;
+  font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--page); color: var(--ink); }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+.topbar {
+  height: 68px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; background: var(--white); border-bottom: 1px solid var(--line);
+}
+.brand, .header-actions, .result-toolbar, .result-actions, .view-tabs { display: flex; align-items: center; }
+.brand { gap: 18px; min-width: 0; }
+.brand-logo { width: 146px; height: auto; flex: none; }
+.brand-name { color: var(--orange); font-size: 18px; font-weight: 700; white-space: nowrap; }
+.brand-divider { width: 1px; height: 28px; background: var(--line); }
+.brand-title { font-size: 17px; font-weight: 700; white-space: nowrap; }
+.header-actions { gap: 16px; }
+.status { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.status::before { content: ""; width: 7px; height: 7px; display: inline-block; margin-right: 7px; border-radius: 50%; background: #ae9b8e; vertical-align: 1px; }
+.status-verified::before { background: #39855d; }
+.workspace { display: grid; grid-template-columns: minmax(360px, 440px) minmax(0, 1fr); height: calc(100vh - 68px); }
+.editor { overflow: auto; background: var(--white); border-right: 1px solid var(--line); }
+.editor-heading { padding: 24px 28px 14px; }
+.editor-heading h1 { margin: 0; font-size: 21px; line-height: 1.4; }
+.editor-heading p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.field-group { border: 0; border-top: 1px solid var(--line); padding: 20px 28px 24px; margin: 0; min-width: 0; }
+.field-group legend { font-size: 14px; font-weight: 700; color: var(--orange); padding: 0 8px 0 0; }
+.field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; color: var(--muted); font-size: 12px; }
+.field-wide { grid-column: 1 / -1; }
+.field input, .field textarea, .field select {
+  width: 100%; min-width: 0; border: 1px solid #d9d4cf; border-radius: 5px; background: var(--white);
+  color: var(--ink); padding: 10px 11px; outline: none; font-size: 13px; line-height: 1.5;
+}
+.field textarea { resize: vertical; min-height: 94px; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--orange-strong); box-shadow: 0 0 0 2px #f9dfd1; }
+.field input[type="file"] { padding: 7px; font-size: 11px; }
+.metrics-fields { margin-top: 15px; }
+.manager-fields { display: grid; gap: 14px; margin-top: 16px; }
+.manager-entry { padding: 14px; border: 1px solid var(--line); border-radius: 6px; display: grid; gap: 12px; }
+.manager-entry h3 { margin: 0; font-size: 13px; color: var(--orange); }
+.checkline { display: flex; align-items: flex-start; gap: 9px; margin-top: 18px; font-size: 12px; line-height: 1.5; color: var(--ink); }
+.checkline input { accent-color: var(--orange-strong); margin: 2px 0 0; }
+.result { min-width: 0; overflow: auto; display: flex; flex-direction: column; background: #eee9e4; }
+.result-toolbar { min-height: 62px; padding: 10px 24px; justify-content: space-between; gap: 12px; background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2; }
+.view-tabs { gap: 4px; }
+.tab { border: 0; background: none; padding: 8px 14px; color: var(--muted); border-bottom: 2px solid transparent; font-size: 13px; }
+.tab.active { color: var(--orange); border-bottom-color: var(--orange-strong); font-weight: 700; }
+.result-actions { gap: 9px; }
+.button { border-radius: 5px; border: 1px solid #d7c8bc; padding: 9px 14px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.button-quiet { background: var(--white); color: var(--orange); }
+.button-primary { background: var(--orange-strong); color: var(--white); border-color: var(--orange-strong); }
+.button:hover { filter: brightness(.96); }
+.button:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.preview-panel { padding: 30px; display: flex; justify-content: center; align-items: flex-start; }
+.preview-panel canvas { width: min(100%, 610px); height: auto; display: block; background: var(--white); box-shadow: 0 8px 30px #553f3426; }
+.copy-panel { padding: 28px; }
+.copy-panel pre { white-space: pre-wrap; word-break: break-word; max-width: 800px; margin: 0 auto; padding: 28px; background: var(--white); border: 1px solid var(--line); border-radius: 6px; font: 15px/1.9 "Microsoft YaHei", "PingFang SC", sans-serif; }
+.toast { position: fixed; right: 22px; bottom: 22px; background: #332c28; color: var(--white); border-radius: 5px; padding: 10px 15px; font-size: 12px; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .18s, transform .18s; z-index: 5; }
+.toast.visible { opacity: 1; transform: translateY(0); }
+@media (max-width: 900px) {
+  .workspace { display: block; height: auto; }
+  .editor { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
+  .result { overflow: visible; }
+  .topbar { padding: 0 16px; }
+  .brand-logo { width: 120px; }
+  .brand-name { font-size: 15px; }
+  .brand-title { font-size: 14px; }
+  .header-actions .status { display: none; }
+}
+@media (max-width: 560px) {
+  .topbar { height: 60px; }
+  .brand { gap: 10px; }
+  .brand-logo { width: 100px; }
+  .brand-name { font-size: 13px; }
+  .brand-divider { height: 22px; }
+  .brand-title { font-size: 12px; }
+  .header-actions { display: none; }
+  .editor-heading, .field-group { padding-left: 18px; padding-right: 18px; }
+  .result-toolbar { padding: 8px 12px; flex-wrap: wrap; }
+  .result-actions { margin-left: auto; }
+  .button { padding: 8px 10px; }
+  .preview-panel { padding: 12px; }
+  .copy-panel { padding: 12px; }
+  .copy-panel pre { padding: 18px; font-size: 13px; }
+}
+

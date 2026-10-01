@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8f3">
+  <title>路演小广告生成器 · 永赢基金示例</title>
+  <link rel="icon" type="image/png" href="assets/yongying-logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/yongying-logo.png" alt="永赢基金" class="brand-logo">
+      <span id="brandName" class="brand-name" hidden></span>
+      <div class="brand-divider"></div>
+      <div class="brand-title">路演小广告生成器</div>
+    </div>
+    <div class="header-actions">
+      <span id="verificationStatus" class="status status-verified">示例数据已核验</span>
+      <button id="resetButton" type="button" class="button button-quiet">恢复示例</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="editor" aria-label="广告资料">
+      <div class="editor-heading">
+        <h1>广告资料</h1>
+        <p>永赢稳健增强债券A · 014088</p>
+      </div>
+
+      <form id="adForm" autocomplete="off">
+        <fieldset class="field-group">
+          <legend>产品与场次</legend>
+          <div class="field-grid">
+            <label class="field"><span>基金公司</span><input data-field="company" maxlength="30" required></label>
+            <label class="field"><span>基金代码</span><input data-field="code" maxlength="16" required></label>
+            <label class="field field-wide"><span>产品全称及份额</span><input data-field="product" maxlength="45" required></label>
+            <label class="field"><span>策略标签</span><input data-field="strategy" maxlength="18" required></label>
+            <label class="field"><span>路演日期</span><input data-field="date" maxlength="24" required></label>
+            <label class="field"><span>路演时间</span><input data-field="time" maxlength="24" required></label>
+            <label class="field"><span>统计区间</span><input data-field="period" maxlength="48" required></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend>产品与业绩</legend>
+          <label class="field"><span>产品特征</span><textarea data-field="features" rows="4" maxlength="160" required></textarea></label>
+          <div class="field-grid metrics-fields">
+            <label class="field"><span>区间累计收益</span><input data-field="cumulative" maxlength="12" required></label>
+            <label class="field"><span>区间年化折算</span><input data-field="annualized" maxlength="12" required></label>
+            <label class="field"><span>年化波动率</span><input data-field="volatility" maxlength="12" required></label>
+            <label class="field"><span>最大回撤</span><input data-field="drawdown" maxlength="12" required></label>
+            <label class="field"><span>同类排名</span><input data-field="ranking" maxlength="30"></label>
+            <label class="field"><span>净值截至</span><input data-field="navDate" maxlength="20" required></label>
+            <label class="field"><span>产品资料截至</span><input data-field="productDate" maxlength="20" required></label>
+            <label class="field field-wide"><span>业绩口径说明</span><input data-field="performanceNote" maxlength="95" required></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend>基金经理</legend>
+          <div class="field-grid">
+            <label class="field"><span>经理人数</span><select data-field="managerCount"><option value="1">1 人</option><option value="2">2 人</option></select></label>
+            <label class="field"><span>经理资料截至</span><input data-field="managerDate" maxlength="20" required></label>
+          </div>
+          <div id="managerFields" class="manager-fields"></div>
+        </fieldset>
+
+        <fieldset class="field-group">
+          <legend>核验与素材</legend>
+          <div class="field-grid">
+            <label class="field field-wide"><span>产品资料链接</span><input data-field="productSource" type="url" placeholder="https://"></label>
+            <label class="field field-wide"><span>经理履历链接</span><input data-field="managerSource" type="url" placeholder="https://"></label>
+            <label class="field field-wide"><span>净值数据链接</span><input data-field="navSource" type="url" placeholder="https://"></label>
+            <label class="field field-wide"><span>Logo 图片</span><input id="logoUpload" type="file" accept="image/png,image/jpeg,image/webp"></label>
+          </div>
+          <label class="checkline"><input id="verifiedCheck" type="checkbox"><span>产品、经理、同一份额净值及所有数值已人工核验</span></label>
+        </fieldset>
+      </form>
+    </section>
+
+    <section class="result" aria-label="生成结果">
+      <div class="result-toolbar">
+        <div class="view-tabs" role="tablist" aria-label="查看结果">
+          <button id="posterTab" type="button" class="tab active" role="tab" aria-selected="true">海报</button>
+          <button id="copyTab" type="button" class="tab" role="tab" aria-selected="false">纯文字</button>
+        </div>
+        <div class="result-actions">
+          <button id="copyButton" type="button" class="button button-quiet">复制文案</button>
+          <button id="downloadButton" type="button" class="button button-primary">下载 PNG</button>
+        </div>
+      </div>
+      <div id="posterPanel" class="preview-panel" role="tabpanel">
+        <canvas id="posterCanvas" width="1080" height="1440" aria-label="路演小广告海报预览"></canvas>
+      </div>
+      <div id="copyPanel" class="copy-panel" role="tabpanel" hidden>
+        <pre id="copyText"></pre>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
+
