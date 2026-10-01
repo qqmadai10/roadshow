@@ -15,6 +15,8 @@ function loadRecords() {
 let records = loadRecords();
 let currentView = "ask";
 let editingId = null;
+let practiceIndex = -1;
+let practiceRecord = null;
 const byId = id => document.getElementById(id);
 const unique = values => [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-CN"));
 
@@ -89,8 +91,45 @@ function renderAsk() {
     list.append(button);
   });
 }
-byId("askClient").addEventListener("change", () => { byId("askMeeting").value = "all"; renderAsk(); clearChat(); });
-byId("askMeeting").addEventListener("change", () => { renderAsk(); clearChat(); });
+byId("askClient").addEventListener("change", () => { byId("askMeeting").value = "all"; renderAsk(); clearChat(); practiceIndex = -1; nextPractice(); });
+byId("askMeeting").addEventListener("change", () => { renderAsk(); clearChat(); practiceIndex = -1; nextPractice(); });
+
+function setMode(mode) {
+  const practice = mode === "practice";
+  byId("lookupPanel").hidden = practice;
+  byId("practicePanel").hidden = !practice;
+  for (const [id, selected] of [["lookupMode", !practice], ["practiceMode", practice]]) {
+    byId(id).classList.toggle("active", selected);
+    byId(id).setAttribute("aria-selected", String(selected));
+  }
+  if (practice && !practiceRecord) nextPractice();
+}
+function nextPractice() {
+  const pool = scopedApproved().sort((a, b) => a.id.localeCompare(b.id));
+  practiceIndex = pool.length ? (practiceIndex + 1) % pool.length : -1;
+  practiceRecord = practiceIndex < 0 ? null : pool[practiceIndex];
+  byId("practiceQuestion").textContent = practiceRecord?.question || "当前范围还没有已审核问题";
+  byId("practiceMeta").textContent = practiceRecord ? `${practiceRecord.client} · ${practiceRecord.meeting} · ${practiceRecord.date}` : "请切换客户或场次，也可以先录入并审核问答。";
+  byId("practiceAnswer").value = "";
+  byId("practiceAnswer").disabled = !practiceRecord;
+  byId("showAnswer").disabled = !practiceRecord;
+  byId("practiceFeedback").hidden = true;
+  byId("practiceFeedback").replaceChildren();
+}
+byId("lookupMode").addEventListener("click", () => setMode("lookup"));
+byId("practiceMode").addEventListener("click", () => setMode("practice"));
+byId("nextQuestion").addEventListener("click", nextPractice);
+byId("showAnswer").addEventListener("click", () => {
+  if (!practiceRecord) return;
+  if (!byId("practiceAnswer").value.trim()) { toast("先写下你的回答，再对照标准答案"); return; }
+  const panel = byId("practiceFeedback");
+  panel.replaceChildren();
+  panel.append(el("h3", "", "已审核标准答案"), el("p", "", practiceRecord.answer));
+  const citation = el("div", "reference", `来源：${practiceRecord.client} · ${practiceRecord.meeting} · 第 ${practiceRecord.version} 版\n依据：`);
+  labelSource(citation, practiceRecord.source);
+  panel.append(citation);
+  panel.hidden = false;
+});
 
 function message(kind, body, record) {
   const box = el("div", `message ${kind}`);
@@ -145,9 +184,10 @@ function renderDatalists() {
 }
 function formValue(form, name) { return String(new FormData(form).get(name) || "").trim(); }
 function validRecord(record) {
+  const date = typeof record.date === "string" ? new Date(`${record.date}T00:00:00Z`) : new Date(NaN);
   return ["client", "meeting", "date", "owner", "question", "answer", "source"].every(key => typeof record[key] === "string" && record[key].trim())
     && /^\d{4}-\d{2}-\d{2}$/.test(record.date)
-    && !Number.isNaN(Date.parse(`${record.date}T00:00:00Z`));
+    && !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === record.date;
 }
 function duplicateOf(record) {
   return records.find(item => item.id !== editingId && item.client === record.client && item.meeting === record.meeting && item.question.trim() === record.question.trim());
@@ -210,6 +250,12 @@ function recordNode(record, reviewMode) {
     const tags = el("div", "record-meta");
     record.tags.forEach(tag => tags.append(el("span", "tag", tag)));
     article.append(tags);
+  }
+  if (record.history?.length) {
+    const details = el("details", "");
+    details.append(el("summary", "", `查看 ${record.history.length} 个历史版本`));
+    record.history.forEach(version => details.append(el("p", "", `第 ${version.version} 版（${statusText(version.status)}）\n${version.answer}\n依据：${version.source}`)));
+    article.append(details);
   }
   const actions = el("div", "record-actions");
   const edit = el("button", "", "修订"); edit.type = "button"; edit.addEventListener("click", () => editRecord(record.id)); actions.append(edit);
@@ -274,6 +320,7 @@ byId("exportButton").addEventListener("click", () => {
 function refresh() {
   byId("pendingCount").textContent = records.filter(record => record.status === "draft").length;
   renderAsk(); renderDatalists(); renderReview(); renderLibrary();
+  if (practiceRecord && !scopedApproved().some(record => record.id === practiceRecord.id)) { practiceIndex = -1; nextPractice(); }
 }
 refresh(); clearChat();
 
