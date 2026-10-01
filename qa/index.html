@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f5">
+  <title>机构客户问答库 · 前端原型</title>
+  <link rel="stylesheet" href="app.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">问</span><span>机构客户问答库</span><span class="prototype">前端原型</span></div>
+    <div class="top-actions"><span class="demo-label">演示数据 · 非真实客户</span><button class="quiet" id="exportButton" type="button">导出本地数据</button></div>
+  </header>
+  <div class="shell">
+    <nav class="sidebar" aria-label="主导航">
+      <div class="nav-heading">工作台</div>
+      <button class="nav-item active" data-view="ask" type="button">客户提问</button>
+      <button class="nav-item" data-view="capture" type="button">路演后入库</button>
+      <button class="nav-item" data-view="review" type="button">答案审核 <span id="pendingCount" class="nav-count">0</span></button>
+      <button class="nav-item" data-view="library" type="button">知识记录</button>
+      <div class="sidebar-note"><strong>资料边界</strong><p>仅检索已审核的问答。原型数据保存在当前浏览器，不会上传服务器或自动训练模型。</p></div>
+    </nav>
+    <main class="main">
+      <section id="askView" class="view active" aria-labelledby="askTitle">
+        <div class="page-heading"><div><p class="eyebrow">销售学习台</p><h1 id="askTitle">先看客户，再回答问题</h1><p class="subtle">按客户与路演场次定位原始问题。答案附审核记录和出处。</p></div><span class="mode-pill">仅已审核</span></div>
+        <div class="filter-bar">
+          <label>客户<select id="askClient"></select></label>
+          <label>路演场次<select id="askMeeting"></select></label>
+        </div>
+        <div class="ask-layout">
+          <div class="conversation">
+            <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+            <form id="askForm" class="ask-form"><label class="sr-only" for="askInput">输入问题</label><input id="askInput" placeholder="例如：这类客户会如何看待组合回撤？" required maxlength="240"><button class="primary" type="submit">提问</button></form>
+            <p class="micro">本地关键词检索演示，不是联网大模型；未命中时不会编造答案。</p>
+          </div>
+          <aside class="context-panel"><div class="panel-title-row"><h2>该范围内的已记录问题</h2><span id="contextCount">0 条</span></div><div id="contextQuestions" class="context-list"></div></aside>
+        </div>
+      </section>
+      <section id="captureView" class="view" aria-labelledby="captureTitle">
+        <div class="page-heading"><div><p class="eyebrow">路演结束后</p><h1 id="captureTitle">把现场问答变成可复用的记录</h1><p class="subtle">每条问题绑定客户、场次、答案和证据。新记录先进入审核队列。</p></div><label class="upload-button">导入 JSON<input id="importInput" type="file" accept="application/json,.json" hidden></label></div>
+        <div class="section-head"><h2 id="formHeading">新增问答</h2><span class="required-note">* 为必填</span></div>
+        <form id="captureForm" class="capture-form">
+          <div class="form-grid">
+            <label>客户名称 *<input name="client" list="clientOptions" required maxlength="50" placeholder="例如：华东某银行理财子"></label>
+            <datalist id="clientOptions"></datalist>
+            <label>路演场次 *<input name="meeting" list="meetingOptions" required maxlength="70" placeholder="例如：固收+产品交流会"></label>
+            <datalist id="meetingOptions"></datalist>
+            <label>路演日期 *<input name="date" type="date" required></label>
+            <label>记录人 *<input name="owner" required maxlength="30" placeholder="销售姓名"></label>
+            <label class="full">客户原话 / 核心问题 *<textarea name="question" rows="3" required maxlength="500" placeholder="尽量保留客户的实际问法"></textarea></label>
+            <label class="full">标准答案 *<textarea name="answer" rows="5" required maxlength="2000" placeholder="回答口径、适用边界和必要的风险说明"></textarea></label>
+            <label class="full">依据与出处 *<input name="source" required maxlength="500" placeholder="报告名称、页码或公开链接；内部资料请写文档编号"></label>
+            <label class="full">主题标签<input name="tags" maxlength="120" placeholder="例如：回撤,考核周期,固收+"></label>
+          </div>
+          <div class="form-actions"><button id="cancelEdit" class="quiet" type="button" hidden>取消编辑</button><button class="primary" type="submit">保存为待审核</button></div>
+        </form>
+        <div class="import-help"><strong>批量导入</strong><span>支持 JSON 数组。字段为 client、meeting、date、owner、question、answer、source、tags；导入后一律待审核。</span><a href="sample-import.json" download>下载示例格式</a></div>
+      </section>
+      <section id="reviewView" class="view" aria-labelledby="reviewTitle">
+        <div class="page-heading"><div><p class="eyebrow">知识把关</p><h1 id="reviewTitle">审核后才进入提问端</h1><p class="subtle">重点核对客户归属、场次、答案口径与来源。修订会重新进入待审核。</p></div></div>
+        <div id="reviewList" class="record-list"></div>
+      </section>
+      <section id="libraryView" class="view" aria-labelledby="libraryTitle">
+        <div class="page-heading"><div><p class="eyebrow">可追溯知识</p><h1 id="libraryTitle">问题发生在哪里，答案从哪里来</h1><p class="subtle">可按客户、场次和关键词查找；记录保留审核状态与版本。</p></div></div>
+        <div class="library-tools"><label>关键词<input id="librarySearch" placeholder="搜索问题、答案或标签"></label><label>状态<select id="libraryStatus"><option value="all">全部状态</option><option value="approved">已审核</option><option value="draft">待审核</option><option value="rejected">已退回</option></select></label></div>
+        <div id="libraryList" class="record-list"></div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
+
